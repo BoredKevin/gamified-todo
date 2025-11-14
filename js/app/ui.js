@@ -3,7 +3,7 @@
  * Handles all DOM manipulation and user interactions
  */
 const UIController = {
-    
+
     /**
      * Initialize UI
      */
@@ -13,7 +13,7 @@ const UIController = {
         this.renderTasks();
         this.renderAchievements();
     },
-    
+
     /**
      * Bind event listeners
      */
@@ -22,48 +22,48 @@ const UIController = {
         document.getElementById('addTaskBtn').addEventListener('click', () => {
             this.showAddTaskModal();
         });
-        
+
         // Sidebar toggle for mobile
         document.getElementById('sidebarToggleTop').addEventListener('click', () => {
             document.querySelector('.sidebar').classList.toggle('toggled');
         });
     },
-    
+
     /**
      * Update player statistics display
      */
     updatePlayerStats() {
         const player = TaskManager.player;
         const progress = GamificationEngine.getLevelProgress(player);
-        
+
         // Update level display
         document.getElementById('levelDisplay').textContent = player.level;
         document.getElementById('userLevel').textContent = `Level ${player.level}`;
-        
+
         // Update progress bar
         document.getElementById('levelProgress').style.width = `${progress.percentage}%`;
-        document.getElementById('xpToNext').textContent = 
+        document.getElementById('xpToNext').textContent =
             `${progress.current}/${progress.required} XP to next level`;
-        
+
         // Update XP
         document.getElementById('totalXP').textContent = player.xp;
         document.getElementById('xpCount').textContent = player.xp;
-        
+
         // Update streak
         document.getElementById('streakDisplay').textContent = `${player.streak} Days`;
         document.getElementById('streakCount').textContent = player.streak;
-        
+
         // Update today's count
         document.getElementById('todayCount').textContent = player.tasksCompletedToday;
     },
-    
+
     /**
      * Render task list
      */
     renderTasks() {
         const taskList = document.getElementById('taskList');
         const tasks = TaskManager.getActiveTasks();
-        
+
         if (tasks.length === 0) {
             taskList.innerHTML = `
                 <div class="text-center text-muted py-4">
@@ -73,7 +73,7 @@ const UIController = {
             `;
             return;
         }
-        
+
         taskList.innerHTML = tasks.map(task => `
             <div class="task-item mb-3 p-3 border rounded" data-task-id="${task.id}">
                 <div class="d-flex justify-content-between align-items-center">
@@ -94,21 +94,21 @@ const UIController = {
                 ${task.dueDate ? `<small class="text-muted">Due: ${new Date(task.dueDate).toLocaleDateString()}</small>` : ''}
             </div>
         `).join('');
-        
+
         // Bind task events
         taskList.querySelectorAll('.task-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
                 TaskManager.completeTask(e.target.dataset.taskId);
             });
         });
-        
+
         taskList.querySelectorAll('.delete-task').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 TaskManager.deleteTask(e.target.closest('button').dataset.taskId);
             });
         });
     },
-    
+
     /**
      * Get Bootstrap color class for difficulty
      * @param {string} difficulty - Task difficulty
@@ -121,7 +121,7 @@ const UIController = {
             hard: 'danger'
         }[difficulty] || 'secondary';
     },
-    
+
     /**
      * Show XP gain animation
      * @param {number} amount - XP amount
@@ -137,12 +137,12 @@ const UIController = {
             <small>Completed: ${taskTitle}</small>
         `;
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.remove();
         }, 3000);
     },
-    
+
     /**
      * Show level up modal
      * @param {number} newLevel - New level
@@ -151,7 +151,7 @@ const UIController = {
         alert(`🎉 Level Up! You've reached Level ${newLevel}!`);
         // In production, use a proper modal component
     },
-    
+
     /**
      * Show achievement unlock notification
      * @param {Array} achievements - Unlocked achievements
@@ -167,24 +167,64 @@ const UIController = {
                 <small>+${achievement.xpReward} XP</small>
             `;
             document.body.appendChild(notification);
-            
+
             setTimeout(() => {
                 notification.remove();
             }, 4000);
         });
     },
-    
+
     /**
      * Show add task modal
      */
     showAddTaskModal() {
-        const title = prompt('Enter task title:');
-        if (!title) return;
-        
-        const difficulty = prompt('Enter difficulty (easy/medium/hard):', 'medium');
-        TaskManager.addTask(title, difficulty, null);
-    },
-    
+        AppModal.open({
+            title: 'Add New Task',
+            size: 'md',
+            submitLabel: 'Add Task',
+            cancelLabel: 'Cancel',
+            body: `
+            <div class="form-group">
+                <label for="taskTitleInput">Title</label>
+                <input type="text" class="form-control" id="taskTitleInput" 
+                       placeholder="e.g. Study 30 minutes" required>
+            </div>
+            <div class="form-group">
+                <label for="taskDifficultyInput">Difficulty</label>
+                <select class="form-control" id="taskDifficultyInput">
+                    <option value="easy">Easy (+${GameConfig.xp.EASY_TASK} XP)</option>
+                    <option value="medium" selected>Medium (+${GameConfig.xp.MEDIUM_TASK} XP)</option>
+                    <option value="hard">Hard (+${GameConfig.xp.HARD_TASK} XP)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="taskDueInput">Due date (optional)</label>
+                <input type="date" class="form-control" id="taskDueInput">
+            </div>
+        `,
+            onSubmit: () => {
+                const titleInput = document.getElementById('taskTitleInput');
+                const difficultyInput = document.getElementById('taskDifficultyInput');
+                const dueInput = document.getElementById('taskDueInput');
+
+                const title = titleInput.value.trim();
+                if (!title) {
+                    titleInput.classList.add('is-invalid');
+                    return false; // keep modal open
+                }
+
+                const difficulty = difficultyInput.value || 'medium';
+                const dueDate = dueInput.value ? new Date(dueInput.value) : null;
+
+                TaskManager.addTask(title, difficulty, dueDate);
+                UIController.updatePlayerStats();
+
+                return true; // close modal
+            }
+        });
+    }
+    ,
+
     /**
      * Render achievements list
      */
@@ -192,7 +232,7 @@ const UIController = {
         const achievementsList = document.getElementById('achievementsList');
         const player = TaskManager.player;
         const unlockedIds = player.unlockedAchievements;
-        
+
         achievementsList.innerHTML = GameConfig.achievements.slice(0, 5).map(ach => {
             const unlocked = unlockedIds.includes(ach.id);
             return `

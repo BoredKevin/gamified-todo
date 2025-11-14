@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>GameDo - Gamified Task Manager</title>
-    
+
     <!-- SB Admin 2 CSS -->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
@@ -13,7 +14,7 @@
 
 <body id="page-top">
     <div id="wrapper">
-        
+
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion">
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
@@ -22,30 +23,30 @@
                 </div>
                 <div class="sidebar-brand-text mx-3">GameDo</div>
             </a>
-            
+
             <hr class="sidebar-divider my-0">
-            
+
             <li class="nav-item active">
                 <a class="nav-link" href="index.html">
                     <i class="fas fa-list"></i>
                     <span>My Tasks</span>
                 </a>
             </li>
-            
+
             <li class="nav-item">
                 <a class="nav-link" href="progress.html">
                     <i class="fas fa-chart-line"></i>
                     <span>Progress</span>
                 </a>
             </li>
-            
+
             <li class="nav-item">
                 <a class="nav-link" href="achievements.html">
                     <i class="fas fa-medal"></i>
                     <span>Achievements</span>
                 </a>
             </li>
-            
+
             <li class="nav-item">
                 <a class="nav-link" href="leaderboard.html">
                     <i class="fas fa-crown"></i>
@@ -53,17 +54,17 @@
                 </a>
             </li>
         </ul>
-        
+
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-                
+
                 <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
-                    
+
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
                         <!-- Streak Counter -->
@@ -73,7 +74,7 @@
                                 <span class="badge badge-danger badge-counter" id="streakCount">0</span>
                             </a>
                         </li>
-                        
+
                         <!-- XP Display -->
                         <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link" href="#">
@@ -81,7 +82,7 @@
                                 <span class="badge badge-warning badge-counter" id="xpCount">0</span>
                             </a>
                         </li>
-                        
+
                         <!-- User Profile -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown">
@@ -91,10 +92,10 @@
                         </li>
                     </ul>
                 </nav>
-                
+
                 <!-- Main Content -->
                 <div class="container-fluid">
-                    
+
                     <!-- Player Stats Row -->
                     <div class="row">
                         <!-- Level Card -->
@@ -103,28 +104,32 @@
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Level</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="levelDisplay">1</div>
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Level
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="levelDisplay">1
+                                            </div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-level-up-alt fa-2x text-gray-300"></i>
                                         </div>
                                     </div>
                                     <div class="progress mt-2" style="height: 10px;">
-                                        <div class="progress-bar" id="levelProgress" role="progressbar" style="width: 0%"></div>
+                                        <div class="progress-bar" id="levelProgress" role="progressbar"
+                                            style="width: 0%"></div>
                                     </div>
                                     <small class="text-muted" id="xpToNext">0/100 XP to next level</small>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Tasks Completed Today -->
                         <div class="col-xl-3 col-md-6 mb-4">
                             <div class="card border-left-success shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Today</div>
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Today
+                                            </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800" id="todayCount">0</div>
                                         </div>
                                         <div class="col-auto">
@@ -134,15 +139,17 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Streak Card -->
                         <div class="col-xl-3 col-md-6 mb-4">
                             <div class="card border-left-warning shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Streak</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="streakDisplay">0 Days</div>
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Streak</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="streakDisplay">0
+                                                Days</div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-fire fa-2x text-gray-300"></i>
@@ -151,14 +158,15 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Total XP -->
                         <div class="col-xl-3 col-md-6 mb-4">
                             <div class="card border-left-info shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total XP</div>
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total XP
+                                            </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalXP">0</div>
                                         </div>
                                         <div class="col-auto">
@@ -169,12 +177,13 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Task Management Section -->
                     <div class="row">
                         <div class="col-lg-8">
                             <div class="card shadow mb-4">
-                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 class="m-0 font-weight-bold text-primary">Active Tasks</h6>
                                     <button class="btn btn-primary btn-sm" id="addTaskBtn">
                                         <i class="fas fa-plus"></i> Add Task
@@ -187,7 +196,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Recent Achievements Sidebar -->
                         <div class="col-lg-4">
                             <div class="card shadow mb-4">
@@ -202,10 +211,10 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
-            
+
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
@@ -216,9 +225,33 @@
             </footer>
         </div>
     </div>
-    
+
+    <!-- Reusable App Modal -->
+    <div class="modal fade" id="appModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" id="appModalDialog">
+            <div class="modal-content gamedo-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="appModalTitle"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- Form is optional; can be used for inputs -->
+                <form id="appModalForm">
+                    <div class="modal-body" id="appModalBody">
+                        <!-- Dynamic content -->
+                    </div>
+                    <div class="modal-footer" id="appModalFooter">
+                        <!-- Dynamic buttons -->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
-    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/jquery/jquery-3.7.1.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="js/sb-admin-2.min.js"></script>
     <script src="js/app/config.js"></script>
@@ -228,4 +261,5 @@
     <script src="js/app/ui.js"></script>
     <script src="js/app/main.js"></script>
 </body>
+
 </html>
