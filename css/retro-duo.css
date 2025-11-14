@@ -1,0 +1,109 @@
+
+/* Body + global */
+body {
+  background: #f7fff1; /* pale green */
+  color: #4c4c4c;
+}
+
+/* Sidebar – light, minimal */
+#accordionSidebar {
+  background: #ffffff;
+  box-shadow: 0 0 20px rgba(0,0,0,0.04);
+}
+
+.sidebar .nav-item .nav-link {
+  color: #4c4c4c;
+  font-weight: 600;
+}
+
+.sidebar .nav-item .nav-link i {
+  color: #8ee000;
+}
+
+.sidebar .nav-item.active .nav-link,
+.sidebar .nav-item .nav-link:hover {
+  background: #e8ffd4;
+  color: #58cc02;
+}
+
+/* Topbar */
+.navbar-light .navbar-nav .nav-link {
+  color: #4c4c4c;
+}
+
+.bg-white.topbar {
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+}
+
+/* Primary theme color */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #8ee000, #58cc02);
+}
+
+.btn-primary {
+  background-color: #58cc02;
+  border-color: #58cc02;
+}
+
+.btn-primary:hover {
+  background-color: #4fb103;
+  border-color: #4fb103;
+}
+
+/* Cards – soft, retro feel */
+.card {
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+}
+
+.card-header {
+  background: transparent;
+  border-bottom: none;
+  font-weight: 700;
+  color: #4c4c4c;
+}
+
+/* Metric cards */
+.card-duo-metric {
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-duo-metric--green {
+  background: linear-gradient(135deg, #f3ffe5, #e8ffd4);
+}
+
+.card-duo-metric--yellow {
+  background: linear-gradient(135deg, #fff8df, #ffeeb3);
+}
+
+.card-duo-metric--blue {
+  background: linear-gradient(135deg, #e7f6ff, #d4efff);
+}
+
+.card-duo-metric .card-body h5 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.card-duo-metric .card-body .display-4 {
+  font-weight: 800;
+}
+
+/* Retro-ish rounded chart container */
+.chart-area {
+  padding: 1rem;
+}
+
+/* Badges / pills */
+.badge-duo {
+  background: #ffc715;
+  color: #4c4c4c;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  padding: 0.25rem 0.6rem;
+}
