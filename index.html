@@ -219,44 +219,56 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-6 mb-4">
+                        <div class="col-lg-7 mb-4">
 
-                            <!-- Simple To-Do List -->
+                            <!-- Enhanced To-Do / Tasks -->
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                                    <h6 class="m-0 font-weight-bold text-primary">To‑Do List</h6>
-                                    <small class="text-muted">Today</small>
+                                    <h6 class="m-0 font-weight-bold text-primary">Tasks</h6>
+                                    <small class="text-muted">Manage your workload</small>
                                 </div>
                                 <div class="card-body">
 
-                                    <!-- Add task -->
-                                    <form id="todo-form" class="form-inline mb-3">
-                                        <div class="form-group mr-2 mb-2">
-                                            <input type="text" class="form-control" id="todo-input"
-                                                placeholder="Add a task...">
+                                    <!-- Add / edit task form -->
+                                    <form id="task-form" class="mb-3">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-7">
+                                                <label for="task-title" class="small mb-1">Title</label>
+                                                <input type="text" class="form-control form-control-sm" id="task-title"
+                                                    placeholder="What do you need to do?" required>
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label for="task-difficulty" class="small mb-1">Difficulty</label>
+                                                <select id="task-difficulty" class="form-control form-control-sm">
+                                                    <option value="easy">Easy</option>
+                                                    <option value="medium" selected>Medium</option>
+                                                    <option value="hard">Hard</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                <label for="task-weight" class="small mb-1">Weight</label>
+                                                <input type="number" id="task-weight"
+                                                    class="form-control form-control-sm" min="1" max="5" value="1">
+                                            </div>
                                         </div>
-                                        <button type="submit" class="btn btn-primary mb-2 btn-sm">
-                                            <i class="fas fa-plus mr-1"></i> Add
-                                        </button>
+
+                                        <div class="form-group">
+                                            <label for="task-description" class="small mb-1">Description</label>
+                                            <textarea id="task-description" class="form-control form-control-sm"
+                                                rows="2" placeholder="Add more details (optional)"></textarea>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">Click a task to expand details.</small>
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-plus mr-1"></i> Save task
+                                            </button>
+                                        </div>
                                     </form>
 
                                     <!-- Tasks list -->
-                                    <ul id="todo-list" class="list-group small">
-                                        <!-- Example static items -->
-                                        <li class="list-group-item d-flex align-items-center">
-                                            <input class="mr-2" type="checkbox">
-                                            <span class="flex-fill">Review vocabulary notes</span>
-                                            <button class="btn btn-sm btn-light text-muted ml-2 btn-todo-remove">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </li>
-                                        <li class="list-group-item d-flex align-items-center">
-                                            <input class="mr-2" type="checkbox" checked>
-                                            <span class="flex-fill text-muted"><s>Finish grammar exercise</s></span>
-                                            <button class="btn btn-sm btn-light text-muted ml-2 btn-todo-remove">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </li>
+                                    <ul id="task-list" class="list-group small">
+                                        <!-- Items will be rendered here by JS -->
                                     </ul>
 
                                 </div>
@@ -264,6 +276,7 @@
 
                         </div>
                     </div>
+
 
                     <!-- Progress + upcoming lessons -->
                     <div class="row">
