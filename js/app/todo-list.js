@@ -1,152 +1,348 @@
-(function () {
-  var STORAGE_KEY = 'sbadmin_tasks_v1';
-  var tasks = [];
-
-  var form = document.getElementById('task-form');
-  var titleInput = document.getElementById('task-title');
-  var difficultyInput = document.getElementById('task-difficulty');
-  var weightInput = document.getElementById('task-weight');
-  var descInput = document.getElementById('task-description');
-  var list = document.getElementById('task-list');
-
-  // ---- Storage helpers ----
-  function saveTasks() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-  }
-
-  function loadTasks() {
-    var raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    try {
-      return JSON.parse(raw);
-    } catch (e) {
-      console.error('Failed to parse tasks from storage', e);
-      return [];
-    }
-  }
-
-  // ---- Rendering ----
-  function difficultyBadgeClass(difficulty) {
-    if (difficulty === 'easy') return 'badge-success';
-    if (difficulty === 'medium') return 'badge-warning';
-    if (difficulty === 'hard') return 'badge-danger';
-    return 'badge-secondary';
-  }
-
-  function renderTasks() {
-    list.innerHTML = '';
-    if (!tasks.length) {
-      var empty = document.createElement('li');
-      empty.className = 'list-group-item text-muted text-center';
-      empty.textContent = 'No tasks yet. Add your first one above.';
-      list.appendChild(empty);
-      return;
+/**
+ * Task Manager Module
+ * Handles task creation, storage, and rendering with modern ES6+ syntax
+ */
+class TaskManager {
+    constructor() {
+        this.STORAGE_KEY = 'sbadmin_tasks_v1';
+        this.tasks = [];
+        this.editingTaskId = null;
+        
+        // DOM Elements
+        this.elements = {
+            modal: $('#taskModal'),
+            form: $('#task-form'),
+            taskList: $('#task-list'),
+            addTaskBtn: $('#add-task-btn'),
+            saveTaskBtn: $('#save-task-btn'),
+            titleInput: $('#task-title'),
+            descriptionInput: $('#task-description'),
+            weightInput: $('#task-weight'),
+            weightDisplay: $('#weight-display'),
+            difficultySelector: $('#difficulty-selector'),
+            modalTitle: $('#modal-title-text')
+        };
+        
+        this.init();
     }
 
-    tasks.forEach(function (task) {
-      var li = document.createElement('li');
-      li.className = 'list-group-item';
-      li.dataset.id = task.id;
-
-      var completedClass = task.status === 'done' ? 'text-muted' : '';
-      var completedCheck = task.status === 'done' ? 'checked' : '';
-
-      li.innerHTML =
-        '<div class="d-flex align-items-start">' +
-        '<div class="mr-2 mt-1">' +
-        '<input type="checkbox" class="task-toggle" ' + completedCheck + '>' +
-        '</div>' +
-        '<div class="flex-fill">' +
-        '<div class="d-flex justify-content-between align-items-center">' +
-        '<div class="' + completedClass + ' font-weight-bold">' + escapeHtml(task.title) + '</div>' +
-        '<div>' +
-        '<span class="badge ' + difficultyBadgeClass(task.difficulty) + ' mr-1">' +
-        task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1) +
-        '</span>' +
-        '<span class="badge badge-light">W ' + task.weight + '</span>' +
-        '</div>' +
-        '</div>' +
-        '<div class="small text-muted mt-1 task-description' + (task.description ? '' : ' d-none') + '">' +
-        escapeHtml(task.description || '') +
-        '</div>' +
-        '</div>' +
-        '<button class="btn btn-sm btn-light text-muted ml-2 task-remove" title="Delete">' +
-        '<i class="fas fa-times"></i>' +
-        '</button>' +
-        '</div>';
-
-      list.appendChild(li);
-    });
-  }
-
-  // Basic escaping for safety
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
-  // ---- Form submit: create task ----
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    var title = titleInput.value.trim();
-    if (!title) return;
-
-    var task = {
-      id: Date.now().toString(),
-      title: title,
-      description: descInput.value.trim(),
-      difficulty: difficultyInput.value || 'medium',
-      weight: parseInt(weightInput.value || '1', 10),
-      status: 'open',
-      createdAt: Date.now()
-    };
-
-    tasks.push(task);
-    saveTasks();
-    renderTasks();
-
-    form.reset();
-    difficultyInput.value = 'medium';
-    weightInput.value = 1;
-  });
-
-  // ---- List interactions: toggle, delete, expand description ----
-  list.addEventListener('click', function (e) {
-    var li = e.target.closest('li[data-id]');
-    if (!li) return;
-    var id = li.dataset.id;
-    var task = tasks.find(function (t) { return t.id === id; });
-    if (!task) return;
-
-    // Delete
-    if (e.target.closest('.task-remove')) {
-      tasks = tasks.filter(function (t) { return t.id !== id; });
-      saveTasks();
-      renderTasks();
-      return;
+    /**
+     * Initialize the task manager
+     */
+    init() {
+        this.loadTasks();
+        this.bindEvents();
+        this.render();
     }
 
-    // Toggle status
-    if (e.target.classList.contains('task-toggle')) {
-      task.status = e.target.checked ? 'done' : 'open';
-      saveTasks();
-      renderTasks();
-      return;
+    /**
+     * Bind all event listeners
+     */
+    bindEvents() {
+        // Open modal for new task
+        this.elements.addTaskBtn.on('click', () => this.openModal());
+        
+        // Difficulty selector
+        this.elements.difficultySelector.on('click', '.difficulty-btn', (e) => {
+            this.selectDifficulty($(e.currentTarget));
+        });
+        
+        // Weight slider
+        this.elements.weightInput.on('input', (e) => {
+            this.elements.weightDisplay.text(e.target.value);
+        });
+        
+        // Save task
+        this.elements.saveTaskBtn.on('click', () => this.saveTask());
+        
+        // Task list interactions
+        this.elements.taskList.on('click', '.task-toggle', (e) => {
+            e.stopPropagation();
+            this.toggleTaskStatus($(e.target).closest('.task-item').data('id'));
+        });
+        
+        this.elements.taskList.on('click', '.task-remove', (e) => {
+            e.stopPropagation();
+            this.deleteTask($(e.target).closest('.task-item').data('id'));
+        });
+        
+        this.elements.taskList.on('click', '.task-item', (e) => {
+            if (!$(e.target).closest('.task-toggle, .task-remove').length) {
+                $(e.currentTarget).find('.task-description').slideToggle(200);
+            }
+        });
+        
+        // Reset modal on close
+        this.elements.modal.on('hidden.bs.modal', () => this.resetModal());
     }
 
-    // Click anywhere else on the row: toggle description visibility
-    var descEl = li.querySelector('.task-description');
-    if (descEl && task.description) {
-      descEl.classList.toggle('d-none');
+    /**
+     * Open modal for creating/editing task
+     */
+    openModal(taskId = null) {
+        if (taskId) {
+            this.editingTaskId = taskId;
+            const task = this.tasks.find(t => t.id === taskId);
+            if (task) {
+                this.populateForm(task);
+                this.elements.modalTitle.text('Edit Task');
+            }
+        } else {
+            this.editingTaskId = null;
+            this.elements.modalTitle.text('Create New Task');
+        }
+        this.elements.modal.modal('show');
     }
-  });
 
-  // ---- Init ----
-  tasks = loadTasks();
-  renderTasks();
-})();
+    /**
+     * Populate form with task data for editing
+     */
+    populateForm(task) {
+        this.elements.titleInput.val(task.title);
+        this.elements.descriptionInput.val(task.description);
+        this.elements.weightInput.val(task.weight);
+        this.elements.weightDisplay.text(task.weight);
+        
+        const difficultyBtn = this.elements.difficultySelector
+            .find(`[data-difficulty="${task.difficulty}"]`);
+        this.selectDifficulty(difficultyBtn);
+    }
+
+    /**
+     * Reset modal to default state
+     */
+    resetModal() {
+        this.elements.form[0].reset();
+        this.elements.weightDisplay.text('1');
+        this.selectDifficulty(
+            this.elements.difficultySelector.find('[data-difficulty="medium"]')
+        );
+        this.editingTaskId = null;
+    }
+
+    /**
+     * Select difficulty level
+     */
+    selectDifficulty($btn) {
+        this.elements.difficultySelector.find('.difficulty-btn').removeClass('active');
+        $btn.addClass('active');
+    }
+
+    /**
+     * Get selected difficulty
+     */
+    getSelectedDifficulty() {
+        return this.elements.difficultySelector.find('.difficulty-btn.active').data('difficulty');
+    }
+
+    /**
+     * Save or update task
+     */
+    saveTask() {
+        const title = this.elements.titleInput.val().trim();
+        
+        if (!title) {
+            this.elements.titleInput.focus();
+            return;
+        }
+
+        const taskData = {
+            title,
+            description: this.elements.descriptionInput.val().trim(),
+            difficulty: this.getSelectedDifficulty(),
+            weight: parseInt(this.elements.weightInput.val(), 10),
+            status: 'open'
+        };
+
+        if (this.editingTaskId) {
+            this.updateTask(this.editingTaskId, taskData);
+        } else {
+            this.createTask(taskData);
+        }
+
+        this.elements.modal.modal('hide');
+    }
+
+    /**
+     * Create new task
+     */
+    createTask(taskData) {
+        const task = {
+            id: Date.now().toString(),
+            ...taskData,
+            createdAt: Date.now()
+        };
+
+        this.tasks.unshift(task);
+        this.saveTasks();
+        this.render();
+    }
+
+    /**
+     * Update existing task
+     */
+    updateTask(id, updates) {
+        const index = this.tasks.findIndex(t => t.id === id);
+        if (index !== -1) {
+            this.tasks[index] = { ...this.tasks[index], ...updates };
+            this.saveTasks();
+            this.render();
+        }
+    }
+
+    /**
+     * Toggle task completion status
+     */
+    toggleTaskStatus(id) {
+        const task = this.tasks.find(t => t.id === id);
+        if (task) {
+            task.status = task.status === 'done' ? 'open' : 'done';
+            this.saveTasks();
+            this.render();
+        }
+    }
+
+    /**
+     * Delete task
+     */
+    deleteTask(id) {
+        if (confirm('Are you sure you want to delete this task?')) {
+            this.tasks = this.tasks.filter(t => t.id !== id);
+            this.saveTasks();
+            this.render();
+        }
+    }
+
+    /**
+     * Save tasks to localStorage
+     */
+    saveTasks() {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.tasks));
+    }
+
+    /**
+     * Load tasks from localStorage
+     */
+    loadTasks() {
+        try {
+            const data = localStorage.getItem(this.STORAGE_KEY);
+            this.tasks = data ? JSON.parse(data) : [];
+        } catch (error) {
+            console.error('Failed to load tasks:', error);
+            this.tasks = [];
+        }
+    }
+
+    /**
+     * Render all tasks
+     */
+    render() {
+        if (!this.tasks.length) {
+            this.renderEmptyState();
+            return;
+        }
+
+        const html = this.tasks.map(task => this.renderTask(task)).join('');
+        this.elements.taskList.html(html);
+    }
+
+    /**
+     * Render empty state
+     */
+    renderEmptyState() {
+        const html = `
+            <li class="list-group-item empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <p class="mb-0">No tasks yet. Click "New Task" to get started!</p>
+            </li>
+        `;
+        this.elements.taskList.html(html);
+    }
+
+    /**
+     * Render individual task
+     */
+    renderTask(task) {
+        const difficultyConfig = this.getDifficultyConfig(task.difficulty);
+        const isCompleted = task.status === 'done';
+        const hasDescription = task.description && task.description.length > 0;
+
+        return `
+            <li class="list-group-item task-item ${isCompleted ? 'completed' : ''}" 
+                data-id="${task.id}">
+                <div class="d-flex align-items-start">
+                    <div class="mr-3">
+                        <input 
+                            type="checkbox" 
+                            class="task-toggle" 
+                            ${isCompleted ? 'checked' : ''}
+                        >
+                    </div>
+                    <div class="flex-fill">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0 task-title ${isCompleted ? 'text-muted' : ''}">
+                                ${this.escapeHtml(task.title)}
+                            </h6>
+                            <div class="d-flex align-items-center">
+                                <span class="badge ${difficultyConfig.badgeClass} mr-2">
+                                    <i class="${difficultyConfig.icon} mr-1"></i>
+                                    ${difficultyConfig.label}
+                                </span>
+                                <span class="badge badge-secondary mr-2" title="Priority Weight">
+                                    <i class="fas fa-weight-hanging mr-1"></i>${task.weight}
+                                </span>
+                                <button class="btn btn-sm btn-outline-danger task-remove" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        ${hasDescription ? `
+                            <div class="task-description small text-muted" style="display: none;">
+                                <i class="fas fa-align-left mr-1"></i>
+                                ${this.escapeHtml(task.description)}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </li>
+        `;
+    }
+
+    /**
+     * Get difficulty configuration
+     */
+    getDifficultyConfig(difficulty) {
+        const configs = {
+            easy: {
+                label: 'Easy',
+                badgeClass: 'badge-success',
+                icon: 'fas fa-smile'
+            },
+            medium: {
+                label: 'Medium',
+                badgeClass: 'badge-warning',
+                icon: 'fas fa-meh'
+            },
+            hard: {
+                label: 'Hard',
+                badgeClass: 'badge-danger',
+                icon: 'fas fa-fire'
+            }
+        };
+        return configs[difficulty] || configs.medium;
+    }
+
+    /**
+     * Escape HTML to prevent XSS
+     */
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
+
+// Initialize when DOM is ready
+$(document).ready(() => {
+    window.taskManager = new TaskManager();
+});

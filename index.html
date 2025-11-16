@@ -20,6 +20,7 @@
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <link href="css/retro-duo.css" rel="stylesheet">
+    <link href="css/gamified-todo.css" rel="stylesheet">
 
 </head>
 
@@ -220,62 +221,102 @@
 
                     <div class="row">
                         <div class="col-lg-7 mb-4">
-
                             <!-- Enhanced To-Do / Tasks -->
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                                     <h6 class="m-0 font-weight-bold text-primary">Tasks</h6>
-                                    <small class="text-muted">Manage your workload</small>
+                                    <button id="add-task-btn" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus mr-1"></i> New Task
+                                    </button>
                                 </div>
                                 <div class="card-body">
-
-                                    <!-- Add / edit task form -->
-                                    <form id="task-form" class="mb-3">
-                                        <div class="form-row">
-                                            <div class="form-group col-md-7">
-                                                <label for="task-title" class="small mb-1">Title</label>
-                                                <input type="text" class="form-control form-control-sm" id="task-title"
-                                                    placeholder="What do you need to do?" required>
-                                            </div>
-                                            <div class="form-group col-md-3">
-                                                <label for="task-difficulty" class="small mb-1">Difficulty</label>
-                                                <select id="task-difficulty" class="form-control form-control-sm">
-                                                    <option value="easy">Easy</option>
-                                                    <option value="medium" selected>Medium</option>
-                                                    <option value="hard">Hard</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-md-2">
-                                                <label for="task-weight" class="small mb-1">Weight</label>
-                                                <input type="number" id="task-weight"
-                                                    class="form-control form-control-sm" min="1" max="5" value="1">
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="task-description" class="small mb-1">Description</label>
-                                            <textarea id="task-description" class="form-control form-control-sm"
-                                                rows="2" placeholder="Add more details (optional)"></textarea>
-                                        </div>
-
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted">Click a task to expand details.</small>
-                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-plus mr-1"></i> Save task
-                                            </button>
-                                        </div>
-                                    </form>
-
                                     <!-- Tasks list -->
-                                    <ul id="task-list" class="list-group small">
+                                    <ul id="task-list" class="list-group">
                                         <!-- Items will be rendered here by JS -->
                                     </ul>
-
                                 </div>
                             </div>
-
                         </div>
                     </div>
+
+                    <!-- Task Modal -->
+                    <div class="modal fade" id="taskModal" tabindex="-1" role="dialog">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-tasks text-primary mr-2"></i>
+                                        <span id="modal-title-text">Create New Task</span>
+                                    </h5>
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        <span>&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="task-form">
+                                        <!-- Task Title -->
+                                        <div class="form-group">
+                                            <label for="task-title" class="font-weight-bold">
+                                                Task Title <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" class="form-control" id="task-title"
+                                                placeholder="What needs to be done?" required>
+                                        </div>
+
+                                        <!-- Task Description -->
+                                        <div class="form-group">
+                                            <label for="task-description" class="font-weight-bold">Description</label>
+                                            <textarea id="task-description" class="form-control" rows="3"
+                                                placeholder="Add more details (optional)"></textarea>
+                                        </div>
+
+                                        <!-- Difficulty Selector -->
+                                        <div class="form-group">
+                                            <label class="font-weight-bold d-block">Difficulty Level</label>
+                                            <div class="difficulty-selector" id="difficulty-selector">
+                                                <button type="button" class="difficulty-btn" data-difficulty="easy">
+                                                    <i class="fas fa-smile"></i>
+                                                    <span>Easy</span>
+                                                </button>
+                                                <button type="button" class="difficulty-btn active"
+                                                    data-difficulty="medium">
+                                                    <i class="fas fa-meh"></i>
+                                                    <span>Medium</span>
+                                                </button>
+                                                <button type="button" class="difficulty-btn" data-difficulty="hard">
+                                                    <i class="fas fa-fire"></i>
+                                                    <span>Hard</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Weight Selector -->
+                                        <div class="form-group">
+                                            <label for="task-weight" class="font-weight-bold">
+                                                Priority Weight
+                                                <span class="badge badge-secondary" id="weight-display">1</span>
+                                            </label>
+                                            <input type="range" id="task-weight" class="custom-range" min="1" max="5"
+                                                value="1">
+                                            <div class="d-flex justify-content-between small text-muted">
+                                                <span>Low</span>
+                                                <span>High</span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                        Cancel
+                                    </button>
+                                    <button type="button" id="save-task-btn" class="btn btn-primary">
+                                        <i class="fas fa-check mr-1"></i> Save Task
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
 
                     <!-- Progress + upcoming lessons -->

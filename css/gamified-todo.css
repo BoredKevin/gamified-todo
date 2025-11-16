@@ -1,0 +1,112 @@
+/* Difficulty Selector Styling */
+.difficulty-selector {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.difficulty-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 10px;
+    border: 2px solid #e3e6f0;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.difficulty-btn i {
+    font-size: 24px;
+    transition: transform 0.2s ease;
+}
+
+.difficulty-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.difficulty-btn:active {
+    transform: translateY(0);
+}
+
+/* Easy - Green */
+.difficulty-btn[data-difficulty="easy"] i {
+    color: #1cc88a;
+}
+
+.difficulty-btn[data-difficulty="easy"].active {
+    border-color: #1cc88a;
+    background: #f0fdf7;
+}
+
+/* Medium - Yellow */
+.difficulty-btn[data-difficulty="medium"] i {
+    color: #f6c23e;
+}
+
+.difficulty-btn[data-difficulty="medium"].active {
+    border-color: #f6c23e;
+    background: #fffbf0;
+}
+
+/* Hard - Red */
+.difficulty-btn[data-difficulty="hard"] i {
+    color: #e74a3b;
+}
+
+.difficulty-btn[data-difficulty="hard"].active {
+    border-color: #e74a3b;
+    background: #fef5f4;
+}
+
+/* Weight Display Badge */
+#weight-display {
+    font-size: 14px;
+    padding: 4px 10px;
+}
+
+/* Task List Improvements */
+.task-item {
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.task-item:hover {
+    background-color: #f8f9fc;
+}
+
+.task-item.completed {
+    opacity: 0.7;
+}
+
+.task-item.completed .task-title {
+    text-decoration: line-through;
+}
+
+/* Custom Range Slider */
+.custom-range::-webkit-slider-thumb {
+    background: #4e73df;
+}
+
+.custom-range::-moz-range-thumb {
+    background: #4e73df;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #858796;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
