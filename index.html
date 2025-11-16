@@ -218,6 +218,53 @@
 
                     </div>
 
+                    <div class="row">
+                        <div class="col-lg-6 mb-4">
+
+                            <!-- Simple To-Do List -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary">To‑Do List</h6>
+                                    <small class="text-muted">Today</small>
+                                </div>
+                                <div class="card-body">
+
+                                    <!-- Add task -->
+                                    <form id="todo-form" class="form-inline mb-3">
+                                        <div class="form-group mr-2 mb-2">
+                                            <input type="text" class="form-control" id="todo-input"
+                                                placeholder="Add a task...">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mb-2 btn-sm">
+                                            <i class="fas fa-plus mr-1"></i> Add
+                                        </button>
+                                    </form>
+
+                                    <!-- Tasks list -->
+                                    <ul id="todo-list" class="list-group small">
+                                        <!-- Example static items -->
+                                        <li class="list-group-item d-flex align-items-center">
+                                            <input class="mr-2" type="checkbox">
+                                            <span class="flex-fill">Review vocabulary notes</span>
+                                            <button class="btn btn-sm btn-light text-muted ml-2 btn-todo-remove">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </li>
+                                        <li class="list-group-item d-flex align-items-center">
+                                            <input class="mr-2" type="checkbox" checked>
+                                            <span class="flex-fill text-muted"><s>Finish grammar exercise</s></span>
+                                            <button class="btn btn-sm btn-light text-muted ml-2 btn-todo-remove">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
                     <!-- Progress + upcoming lessons -->
                     <div class="row">
 
@@ -343,6 +390,7 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
+    <script src="js/app/todo-list.js"></script>
 
     <!-- Page level plugins -->
     <script src="vendor/chart.js/Chart.min.js"></script>
