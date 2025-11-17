@@ -7,7 +7,7 @@ class TaskManager {
         this.STORAGE_KEY = 'sbadmin_tasks_v1';
         this.tasks = [];
         this.editingTaskId = null;
-        
+
         // DOM Elements
         this.elements = {
             modal: $('#taskModal'),
@@ -22,7 +22,7 @@ class TaskManager {
             difficultySelector: $('#difficulty-selector'),
             modalTitle: $('#modal-title-text')
         };
-        
+
         this.init();
     }
 
@@ -41,37 +41,50 @@ class TaskManager {
     bindEvents() {
         // Open modal for new task
         this.elements.addTaskBtn.on('click', () => this.openModal());
-        
+
         // Difficulty selector
         this.elements.difficultySelector.on('click', '.difficulty-btn', (e) => {
             this.selectDifficulty($(e.currentTarget));
         });
-        
+
         // Weight slider
         this.elements.weightInput.on('input', (e) => {
             this.elements.weightDisplay.text(e.target.value);
         });
-        
+
         // Save task
         this.elements.saveTaskBtn.on('click', () => this.saveTask());
-        
+
         // Task list interactions
         this.elements.taskList.on('click', '.task-toggle', (e) => {
             e.stopPropagation();
             this.toggleTaskStatus($(e.target).closest('.task-item').data('id'));
         });
-        
+
         this.elements.taskList.on('click', '.task-remove', (e) => {
             e.stopPropagation();
-            this.deleteTask($(e.target).closest('.task-item').data('id'));
+
+            // Debugging logs
+            console.log('Delete button clicked');
+            console.log('e.target:', e.target); // What was actually clicked
+            console.log('e.currentTarget:', e.currentTarget); // The .task-remove button
+
+            // FIX: Use e.currentTarget instead of e.target
+            const taskItem = $(e.currentTarget).closest('.task-item');
+            const taskId = taskItem.data('id');
+
+            console.log('Task item found:', taskItem);
+            console.log('Task ID:', taskId);
+
+            this.deleteTask(taskId);
         });
-        
+
         this.elements.taskList.on('click', '.task-item', (e) => {
             if (!$(e.target).closest('.task-toggle, .task-remove').length) {
                 $(e.currentTarget).find('.task-description').slideToggle(200);
             }
         });
-        
+
         // Reset modal on close
         this.elements.modal.on('hidden.bs.modal', () => this.resetModal());
     }
@@ -102,7 +115,7 @@ class TaskManager {
         this.elements.descriptionInput.val(task.description);
         this.elements.weightInput.val(task.weight);
         this.elements.weightDisplay.text(task.weight);
-        
+
         const difficultyBtn = this.elements.difficultySelector
             .find(`[data-difficulty="${task.difficulty}"]`);
         this.selectDifficulty(difficultyBtn);
@@ -140,7 +153,7 @@ class TaskManager {
      */
     saveTask() {
         const title = this.elements.titleInput.val().trim();
-        
+
         if (!title) {
             this.elements.titleInput.focus();
             return;
@@ -206,10 +219,26 @@ class TaskManager {
      * Delete task
      */
     deleteTask(id) {
+        console.log('deleteTask called with ID:', id);
+        console.log('Current tasks:', this.tasks);
+
+        if (!id) {
+            console.error('ERROR: No task ID provided!');
+            return;
+        }
+
         if (confirm('Are you sure you want to delete this task?')) {
+            const tasksBefore = this.tasks.length;
             this.tasks = this.tasks.filter(t => t.id !== id);
+            const tasksAfter = this.tasks.length;
+
+            console.log(`Tasks before: ${tasksBefore}, after: ${tasksAfter}`);
+
             this.saveTasks();
             this.render();
+            console.log('Task deleted successfully');
+        } else {
+            console.log('Delete cancelled by user');
         }
     }
 
