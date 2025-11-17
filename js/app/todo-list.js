@@ -1,377 +1,532 @@
+/*The MIT License (MIT)
+
+Copyright (c) 2025 BoredKevin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.*/
+
+// ==================== TASK MANAGER APP ====================
+// Main application logic with CRUD operations and debugging
+
+// Initialize tasks array from localStorage
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+let currentTaskId = null; // Track task being edited
+
+console.log('Task Manager Initialized');
+console.log('Loaded tasks from localStorage:', tasks);
+
+// ==================== UTILITY FUNCTIONS ====================
+
 /**
- * Task Manager Module
- * Handles task creation, storage, and rendering with modern ES6+ syntax
+ * Generate unique ID for tasks
  */
-class TaskManager {
-    constructor() {
-        this.STORAGE_KEY = 'sbadmin_tasks_v1';
-        this.tasks = [];
-        this.editingTaskId = null;
+function generateId() {
+    const id = Date.now() + Math.random();
+    console.log('Generated new task ID:', id);
+    return id;
+}
 
-        // DOM Elements
-        this.elements = {
-            modal: $('#taskModal'),
-            form: $('#task-form'),
-            taskList: $('#task-list'),
-            addTaskBtn: $('#add-task-btn'),
-            saveTaskBtn: $('#save-task-btn'),
-            titleInput: $('#task-title'),
-            descriptionInput: $('#task-description'),
-            weightInput: $('#task-weight'),
-            weightDisplay: $('#weight-display'),
-            difficultySelector: $('#difficulty-selector'),
-            modalTitle: $('#modal-title-text')
-        };
-
-        this.init();
-    }
-
-    /**
-     * Initialize the task manager
-     */
-    init() {
-        this.loadTasks();
-        this.bindEvents();
-        this.render();
-    }
-
-    /**
-     * Bind all event listeners
-     */
-    bindEvents() {
-        // Open modal for new task
-        this.elements.addTaskBtn.on('click', () => this.openModal());
-
-        // Difficulty selector
-        this.elements.difficultySelector.on('click', '.difficulty-btn', (e) => {
-            this.selectDifficulty($(e.currentTarget));
-        });
-
-        // Weight slider
-        this.elements.weightInput.on('input', (e) => {
-            this.elements.weightDisplay.text(e.target.value);
-        });
-
-        // Save task
-        this.elements.saveTaskBtn.on('click', () => this.saveTask());
-
-        // Task list interactions
-        this.elements.taskList.on('click', '.task-toggle', (e) => {
-            e.stopPropagation();
-            this.toggleTaskStatus($(e.target).closest('.task-item').data('id'));
-        });
-
-        this.elements.taskList.on('click', '.task-remove', (e) => {
-            e.stopPropagation();
-
-            // Debugging logs
-            console.log('Delete button clicked');
-            console.log('e.target:', e.target); // What was actually clicked
-            console.log('e.currentTarget:', e.currentTarget); // The .task-remove button
-
-            // FIX: Use e.currentTarget instead of e.target
-            const taskItem = $(e.currentTarget).closest('.task-item');
-            const taskId = taskItem.data('id');
-
-            console.log('Task item found:', taskItem);
-            console.log('Task ID:', taskId);
-
-            this.deleteTask(taskId);
-        });
-
-        this.elements.taskList.on('click', '.task-item', (e) => {
-            if (!$(e.target).closest('.task-toggle, .task-remove').length) {
-                $(e.currentTarget).find('.task-description').slideToggle(200);
-            }
-        });
-
-        // Reset modal on close
-        this.elements.modal.on('hidden.bs.modal', () => this.resetModal());
-    }
-
-    /**
-     * Open modal for creating/editing task
-     */
-    openModal(taskId = null) {
-        if (taskId) {
-            this.editingTaskId = taskId;
-            const task = this.tasks.find(t => t.id === taskId);
-            if (task) {
-                this.populateForm(task);
-                this.elements.modalTitle.text('Edit Task');
-            }
-        } else {
-            this.editingTaskId = null;
-            this.elements.modalTitle.text('Create New Task');
-        }
-        this.elements.modal.modal('show');
-    }
-
-    /**
-     * Populate form with task data for editing
-     */
-    populateForm(task) {
-        this.elements.titleInput.val(task.title);
-        this.elements.descriptionInput.val(task.description);
-        this.elements.weightInput.val(task.weight);
-        this.elements.weightDisplay.text(task.weight);
-
-        const difficultyBtn = this.elements.difficultySelector
-            .find(`[data-difficulty="${task.difficulty}"]`);
-        this.selectDifficulty(difficultyBtn);
-    }
-
-    /**
-     * Reset modal to default state
-     */
-    resetModal() {
-        this.elements.form[0].reset();
-        this.elements.weightDisplay.text('1');
-        this.selectDifficulty(
-            this.elements.difficultySelector.find('[data-difficulty="medium"]')
-        );
-        this.editingTaskId = null;
-    }
-
-    /**
-     * Select difficulty level
-     */
-    selectDifficulty($btn) {
-        this.elements.difficultySelector.find('.difficulty-btn').removeClass('active');
-        $btn.addClass('active');
-    }
-
-    /**
-     * Get selected difficulty
-     */
-    getSelectedDifficulty() {
-        return this.elements.difficultySelector.find('.difficulty-btn.active').data('difficulty');
-    }
-
-    /**
-     * Save or update task
-     */
-    saveTask() {
-        const title = this.elements.titleInput.val().trim();
-
-        if (!title) {
-            this.elements.titleInput.focus();
-            return;
-        }
-
-        const taskData = {
-            title,
-            description: this.elements.descriptionInput.val().trim(),
-            difficulty: this.getSelectedDifficulty(),
-            weight: parseInt(this.elements.weightInput.val(), 10),
-            status: 'open'
-        };
-
-        if (this.editingTaskId) {
-            this.updateTask(this.editingTaskId, taskData);
-        } else {
-            this.createTask(taskData);
-        }
-
-        this.elements.modal.modal('hide');
-    }
-
-    /**
-     * Create new task
-     */
-    createTask(taskData) {
-        const task = {
-            id: Date.now().toString(),
-            ...taskData,
-            createdAt: Date.now()
-        };
-
-        this.tasks.unshift(task);
-        this.saveTasks();
-        this.render();
-    }
-
-    /**
-     * Update existing task
-     */
-    updateTask(id, updates) {
-        const index = this.tasks.findIndex(t => t.id === id);
-        if (index !== -1) {
-            this.tasks[index] = { ...this.tasks[index], ...updates };
-            this.saveTasks();
-            this.render();
-        }
-    }
-
-    /**
-     * Toggle task completion status
-     */
-    toggleTaskStatus(id) {
-        const task = this.tasks.find(t => t.id === id);
-        if (task) {
-            task.status = task.status === 'done' ? 'open' : 'done';
-            this.saveTasks();
-            this.render();
-        }
-    }
-
-    /**
-     * Delete task
-     */
-    deleteTask(id) {
-        console.log('deleteTask called with ID:', id);
-        console.log('Current tasks:', this.tasks);
-
-        if (!id) {
-            console.error('ERROR: No task ID provided!');
-            return;
-        }
-
-        if (confirm('Are you sure you want to delete this task?')) {
-            const tasksBefore = this.tasks.length;
-            this.tasks = this.tasks.filter(t => t.id !== id);
-            const tasksAfter = this.tasks.length;
-
-            console.log(`Tasks before: ${tasksBefore}, after: ${tasksAfter}`);
-
-            this.saveTasks();
-            this.render();
-            console.log('Task deleted successfully');
-        } else {
-            console.log('Delete cancelled by user');
-        }
-    }
-
-    /**
-     * Save tasks to localStorage
-     */
-    saveTasks() {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.tasks));
-    }
-
-    /**
-     * Load tasks from localStorage
-     */
-    loadTasks() {
-        try {
-            const data = localStorage.getItem(this.STORAGE_KEY);
-            this.tasks = data ? JSON.parse(data) : [];
-        } catch (error) {
-            console.error('Failed to load tasks:', error);
-            this.tasks = [];
-        }
-    }
-
-    /**
-     * Render all tasks
-     */
-    render() {
-        if (!this.tasks.length) {
-            this.renderEmptyState();
-            return;
-        }
-
-        const html = this.tasks.map(task => this.renderTask(task)).join('');
-        this.elements.taskList.html(html);
-    }
-
-    /**
-     * Render empty state
-     */
-    renderEmptyState() {
-        const html = `
-            <li class="list-group-item empty-state">
-                <i class="fas fa-clipboard-list"></i>
-                <p class="mb-0">No tasks yet. Click "New Task" to get started!</p>
-            </li>
-        `;
-        this.elements.taskList.html(html);
-    }
-
-    /**
-     * Render individual task
-     */
-    renderTask(task) {
-        const difficultyConfig = this.getDifficultyConfig(task.difficulty);
-        const isCompleted = task.status === 'done';
-        const hasDescription = task.description && task.description.length > 0;
-
-        return `
-            <li class="list-group-item task-item ${isCompleted ? 'completed' : ''}" 
-                data-id="${task.id}">
-                <div class="d-flex align-items-start">
-                    <div class="mr-3">
-                        <input 
-                            type="checkbox" 
-                            class="task-toggle" 
-                            ${isCompleted ? 'checked' : ''}
-                        >
-                    </div>
-                    <div class="flex-fill">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="mb-0 task-title ${isCompleted ? 'text-muted' : ''}">
-                                ${this.escapeHtml(task.title)}
-                            </h6>
-                            <div class="d-flex align-items-center">
-                                <span class="badge ${difficultyConfig.badgeClass} mr-2">
-                                    <i class="${difficultyConfig.icon} mr-1"></i>
-                                    ${difficultyConfig.label}
-                                </span>
-                                <span class="badge badge-secondary mr-2" title="Priority Weight">
-                                    <i class="fas fa-weight-hanging mr-1"></i>${task.weight}
-                                </span>
-                                <button class="btn btn-sm btn-outline-danger task-remove" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                        ${hasDescription ? `
-                            <div class="task-description small text-muted" style="display: none;">
-                                <i class="fas fa-align-left mr-1"></i>
-                                ${this.escapeHtml(task.description)}
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-            </li>
-        `;
-    }
-
-    /**
-     * Get difficulty configuration
-     */
-    getDifficultyConfig(difficulty) {
-        const configs = {
-            easy: {
-                label: 'Easy',
-                badgeClass: 'badge-success',
-                icon: 'fas fa-smile'
-            },
-            medium: {
-                label: 'Medium',
-                badgeClass: 'badge-warning',
-                icon: 'fas fa-meh'
-            },
-            hard: {
-                label: 'Hard',
-                badgeClass: 'badge-danger',
-                icon: 'fas fa-fire'
-            }
-        };
-        return configs[difficulty] || configs.medium;
-    }
-
-    /**
-     * Escape HTML to prevent XSS
-     */
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+/**
+ * Save tasks to localStorage
+ */
+function saveTasks() {
+    try {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+        console.log('Tasks saved to localStorage:', tasks);
+    } catch (error) {
+        console.error('Error saving tasks:', error);
     }
 }
 
-// Initialize when DOM is ready
-$(document).ready(() => {
-    window.taskManager = new TaskManager();
+/**
+ * Get difficulty badge color
+ */
+function getDifficultyBadge(difficulty) {
+    const badges = {
+        easy: { class: 'success', icon: 'smile', text: 'Easy' },
+        medium: { class: 'warning', icon: 'meh', text: 'Medium' },
+        hard: { class: 'danger', icon: 'fire', text: 'Hard' }
+    };
+    return badges[difficulty] || badges.medium;
+}
+
+// ==================== RENDER FUNCTIONS ====================
+
+/**
+ * Render all tasks to the DOM
+ */
+function renderTasks() {
+    console.log('Rendering tasks...');
+    const taskList = document.getElementById('task-list');
+    
+    if (!taskList) {
+        console.error('Task list element not found!');
+        return;
+    }
+
+    // Clear existing tasks
+    taskList.innerHTML = '';
+
+    if (tasks.length === 0) {
+        taskList.innerHTML = `
+            <li class="list-group-item text-center text-muted py-4">
+                <i class="fas fa-clipboard-list fa-2x mb-2"></i>
+                <p class="mb-0">No tasks yet. Click "New Task" to get started!</p>
+            </li>
+        `;
+        console.log('No tasks to display');
+        return;
+    }
+
+    // Render each task
+    tasks.forEach((task, index) => {
+        const badge = getDifficultyBadge(task.difficulty);
+        const completedClass = task.completed ? 'task-completed' : '';
+        
+        const taskItem = document.createElement('li');
+        taskItem.className = `list-group-item ${completedClass}`;
+        taskItem.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="custom-control custom-checkbox d-inline-block">
+                        <input type="checkbox" class="custom-control-input" 
+                            id="task-${task.id}" 
+                            ${task.completed ? 'checked' : ''}
+                            onchange="toggleTask(${task.id})">
+                        <label class="custom-control-label" for="task-${task.id}">
+                            <strong class="${task.completed ? 'text-muted text-decoration-line-through' : ''}">
+                                ${escapeHtml(task.title)}
+                            </strong>
+                        </label>
+                    </div>
+                    <span class="badge badge-${badge.class} ml-2">
+                        <i class="fas fa-${badge.icon}"></i> ${badge.text}
+                    </span>
+                    ${task.description ? `
+                        <p class="mb-0 mt-2 text-muted small ${task.completed ? 'text-decoration-line-through' : ''}">
+                            ${escapeHtml(task.description)}
+                        </p>
+                    ` : ''}
+                    <small class="text-muted d-block mt-1">
+                        <i class="far fa-clock"></i> Created: ${formatDate(task.createdAt)}
+                    </small>
+                </div>
+                <div class="btn-group ml-2">
+                    <button class="btn btn-sm btn-outline-primary" onclick="editTask(${task.id})" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${task.id})" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        taskList.appendChild(taskItem);
+    });
+
+    console.log(`Rendered ${tasks.length} task(s)`);
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * Format date for display
+ */
+function formatDate(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('id-ID', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// ==================== CRUD OPERATIONS ====================
+
+/**
+ * CREATE: Add new task
+ */
+function createTask(taskData) {
+    console.log('Creating new task:', taskData);
+    
+    const newTask = {
+        id: generateId(),
+        title: taskData.title,
+        description: taskData.description || '',
+        difficulty: taskData.difficulty || 'medium',
+        completed: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    };
+
+    tasks.push(newTask);
+    saveTasks();
+    renderTasks();
+    
+    console.log('Task created successfully:', newTask);
+    showNotification('Task created successfully!', 'success');
+}
+
+/**
+ * READ: Get task by ID
+ */
+function getTaskById(id) {
+    const task = tasks.find(task => task.id === id);
+    console.log(`Getting task with ID ${id}:`, task);
+    return task;
+}
+
+/**
+ * UPDATE: Edit existing task
+ */
+function updateTask(id, updatedData) {
+    console.log(`Updating task ${id} with data:`, updatedData);
+    
+    const taskIndex = tasks.findIndex(task => task.id === id);
+    
+    if (taskIndex === -1) {
+        console.error(`Task with ID ${id} not found!`);
+        return;
+    }
+
+    tasks[taskIndex] = {
+        ...tasks[taskIndex],
+        title: updatedData.title,
+        description: updatedData.description || '',
+        difficulty: updatedData.difficulty,
+        updatedAt: Date.now()
+    };
+
+    saveTasks();
+    renderTasks();
+    
+    console.log('Task updated successfully:', tasks[taskIndex]);
+    showNotification('Task updated successfully!', 'success');
+}
+
+/**
+ * DELETE: Remove task
+ */
+function deleteTask(id) {
+    console.log(`Attempting to delete task with ID: ${id}`);
+    
+    const task = getTaskById(id);
+    
+    if (!task) {
+        console.error(`Task with ID ${id} not found!`);
+        return;
+    }
+
+    // Confirm deletion
+    if (confirm(`Are you sure you want to delete "${task.title}"?`)) {
+        tasks = tasks.filter(task => task.id !== id);
+        saveTasks();
+        renderTasks();
+        
+        console.log(`Task deleted successfully. Remaining tasks: ${tasks.length}`);
+        showNotification('Task deleted successfully!', 'info');
+    } else {
+        console.log('Task deletion cancelled by user');
+    }
+}
+
+/**
+ * TOGGLE: Mark task as complete/incomplete
+ */
+function toggleTask(id) {
+    console.log(`Toggling task completion for ID: ${id}`);
+    
+    const task = getTaskById(id);
+    
+    if (!task) {
+        console.error(`Task with ID ${id} not found!`);
+        return;
+    }
+
+    task.completed = !task.completed;
+    task.updatedAt = Date.now();
+    
+    saveTasks();
+    renderTasks();
+    
+    console.log(`Task ${task.completed ? 'completed' : 'uncompleted'}:`, task);
+}
+
+/**
+ * EDIT: Open modal with task data for editing
+ */
+function editTask(id) {
+    console.log(`Opening edit modal for task ID: ${id}`);
+    
+    const task = getTaskById(id);
+    
+    if (!task) {
+        console.error(`Task with ID ${id} not found!`);
+        return;
+    }
+
+    currentTaskId = id;
+    
+    // Populate modal with task data
+    document.getElementById('task-title').value = task.title;
+    document.getElementById('task-description').value = task.description;
+    document.getElementById('modal-title-text').textContent = 'Edit Task';
+    
+    // Set difficulty
+    setDifficulty(task.difficulty);
+    
+    // Show modal
+    $('#taskModal').modal('show');
+    
+    console.log('Modal populated with task data:', task);
+}
+
+// ==================== MODAL FUNCTIONS ====================
+
+/**
+ * Open modal for creating new task
+ */
+function openNewTaskModal() {
+    console.log('Opening new task modal');
+    
+    currentTaskId = null;
+    
+    // Reset form
+    document.getElementById('task-form').reset();
+    document.getElementById('modal-title-text').textContent = 'Create New Task';
+    
+    // Set default difficulty
+    setDifficulty('medium');
+    
+    // Show modal
+    $('#taskModal').modal('show');
+}
+
+/**
+ * Set difficulty in the modal
+ */
+function setDifficulty(difficulty) {
+    console.log(`Setting difficulty to: ${difficulty}`);
+    
+    const buttons = document.querySelectorAll('.difficulty-btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.difficulty === difficulty) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+/**
+ * Get selected difficulty from modal
+ */
+function getSelectedDifficulty() {
+    const activeBtn = document.querySelector('.difficulty-btn.active');
+    const difficulty = activeBtn ? activeBtn.dataset.difficulty : 'medium';
+    console.log(`Selected difficulty: ${difficulty}`);
+    return difficulty;
+}
+
+/**
+ * Save task from modal (create or update)
+ */
+function saveTask() {
+    console.log('Attempting to save task...');
+    
+    const title = document.getElementById('task-title').value.trim();
+    const description = document.getElementById('task-description').value.trim();
+    const difficulty = getSelectedDifficulty();
+
+    // Validation
+    if (!title) {
+        console.warn('Validation failed: Title is required');
+        showNotification('Please enter a task title!', 'warning');
+        document.getElementById('task-title').focus();
+        return;
+    }
+
+    const taskData = {
+        title,
+        description,
+        difficulty
+    };
+
+    if (currentTaskId) {
+        // Update existing task
+        updateTask(currentTaskId, taskData);
+    } else {
+        // Create new task
+        createTask(taskData);
+    }
+
+    // Close modal
+    $('#taskModal').modal('hide');
+    
+    // Reset form
+    document.getElementById('task-form').reset();
+    currentTaskId = null;
+}
+
+// ==================== NOTIFICATION SYSTEM ====================
+
+/**
+ * Show notification toast
+ */
+function showNotification(message, type = 'info') {
+    console.log(`Notification [${type}]: ${message}`);
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// ==================== EVENT LISTENERS ====================
+
+/**
+ * Initialize event listeners when DOM is ready
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Initializing event listeners...');
+
+    // New Task Button
+    const addTaskBtn = document.getElementById('add-task-btn');
+    if (addTaskBtn) {
+        addTaskBtn.addEventListener('click', openNewTaskModal);
+        console.log('New Task button listener attached');
+    } else {
+        console.error('New Task button not found!');
+    }
+
+    // Save Task Button
+    const saveTaskBtn = document.getElementById('save-task-btn');
+    if (saveTaskBtn) {
+        saveTaskBtn.addEventListener('click', saveTask);
+        console.log('Save Task button listener attached');
+    } else {
+        console.error('Save Task button not found!');
+    }
+
+    // Difficulty Buttons
+    const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+    difficultyButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const difficulty = this.dataset.difficulty;
+            setDifficulty(difficulty);
+        });
+    });
+    console.log(`${difficultyButtons.length} difficulty button listeners attached`);
+
+    // Form submission on Enter key
+    const taskForm = document.getElementById('task-form');
+    if (taskForm) {
+        taskForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submitted via Enter key');
+            saveTask();
+        });
+        console.log('Form submit listener attached');
+    }
+
+    // Reset modal when closed
+    $('#taskModal').on('hidden.bs.modal', function() {
+        console.log('Modal closed - Resetting form');
+        document.getElementById('task-form').reset();
+        currentTaskId = null;
+        setDifficulty('medium');
+    });
+
+    // Initial render
+    renderTasks();
+    console.log('Task Manager fully initialized and ready!');
 });
+
+// ==================== DEBUGGING FUNCTIONS ====================
+
+/**
+ * Debug function: Clear all tasks
+ */
+function clearAllTasks() {
+    console.log('DEBUG: Clearing all tasks...');
+    if (confirm('WARNING - DEBUG MODE: This will delete all tasks. Continue?')) {
+        tasks = [];
+        saveTasks();
+        renderTasks();
+        console.log('All tasks cleared');
+    }
+}
+
+/**
+ * Debug function: Add sample tasks
+ */
+function addSampleTasks() {
+    console.log('DEBUG: Adding sample tasks...');
+    
+    const sampleTasks = [
+        {
+            title: 'Complete project documentation',
+            description: 'Write comprehensive documentation for the new feature',
+            difficulty: 'medium'
+        },
+        {
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },
+        {
+            title: 'Team meeting',
+            description: 'Weekly sync with the development team',
+            difficulty: 'easy'
+        }
+    ];
+
+    sampleTasks.forEach(task => createTask(task));
+    console.log('Sample tasks added');
+}
+
+// Make functions available globally for inline event handlers
+window.toggleTask = toggleTask;
+window.editTask = editTask;
+window.deleteTask = deleteTask;
+window.clearAllTasks = clearAllTasks;
+window.addSampleTasks = addSampleTasks;
+
+console.log('Global functions registered');
