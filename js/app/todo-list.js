@@ -424,8 +424,8 @@ function showNotification(message, type = 'info') {
 /**
  * Initialize event listeners when DOM is ready
  */
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded - Initializing event listeners...');
+document.addEventListener('scripts:loaded', function() {
+    console.log('scripts:loaded - Initializing event listeners...');
 
     // New Task Button
     const addTaskBtn = document.getElementById('add-task-btn');

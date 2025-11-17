@@ -59,6 +59,7 @@ async function bootstrapApp() {
     await loadScript('js/demo/chart-pie-demo.js');
     
     console.log('All scripts loaded successfully');
+    document.dispatchEvent(new Event('scripts:loaded'));
   } catch (err) {
     console.error('Error bootstrapping app:', err);
   }
