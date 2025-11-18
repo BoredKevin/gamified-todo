@@ -65,106 +65,7 @@ function getDifficultyBadge(difficulty) {
     return badges[difficulty] || badges.medium;
 }
 
-// ==================== RENDER FUNCTIONS ====================
 
-/**
- * Render all tasks to the DOM
- */
-function renderTasks() {
-    console.log('Rendering tasks...');
-    const taskList = document.getElementById('task-list');
-    
-    if (!taskList) {
-        console.error('Task list element not found!');
-        return;
-    }
-
-    // Clear existing tasks
-    taskList.innerHTML = '';
-
-    if (tasks.length === 0) {
-        taskList.innerHTML = `
-            <li class="list-group-item text-center text-muted py-4">
-                <i class="fas fa-clipboard-list fa-2x mb-2"></i>
-                <p class="mb-0">No tasks yet. Click "New Task" to get started!</p>
-            </li>
-        `;
-        console.log('No tasks to display');
-        return;
-    }
-
-    // Render each task
-    tasks.forEach((task, index) => {
-        const badge = getDifficultyBadge(task.difficulty);
-        const completedClass = task.completed ? 'task-completed' : '';
-        
-        const taskItem = document.createElement('li');
-        taskItem.className = `list-group-item ${completedClass}`;
-        taskItem.innerHTML = `
-            <div class="d-flex justify-content-between align-items-start">
-                <div class="flex-grow-1">
-                    <div class="custom-control custom-checkbox d-inline-block">
-                        <input type="checkbox" class="custom-control-input" 
-                            id="task-${task.id}" 
-                            ${task.completed ? 'checked' : ''}
-                            onchange="toggleTask(${task.id})">
-                        <label class="custom-control-label" for="task-${task.id}">
-                            <strong class="${task.completed ? 'text-muted text-decoration-line-through' : ''}">
-                                ${escapeHtml(task.title)}
-                            </strong>
-                        </label>
-                    </div>
-                    <span class="badge badge-${badge.class} ml-2">
-                        <i class="fas fa-${badge.icon}"></i> ${badge.text}
-                    </span>
-                    ${task.description ? `
-                        <p class="mb-0 mt-2 text-muted small ${task.completed ? 'text-decoration-line-through' : ''}">
-                            ${escapeHtml(task.description)}
-                        </p>
-                    ` : ''}
-                    <small class="text-muted d-block mt-1">
-                        <i class="far fa-clock"></i> Created: ${formatDate(task.createdAt)}
-                    </small>
-                </div>
-                <div class="btn-group ml-2">
-                    <button class="btn btn-sm btn-outline-primary" onclick="editTask(${task.id})" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${task.id})" title="Delete">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        taskList.appendChild(taskItem);
-    });
-
-    console.log(`Rendered ${tasks.length} task(s)`);
-}
-
-/**
- * Escape HTML to prevent XSS
- */
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-/**
- * Format date for display
- */
-function formatDate(timestamp) {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString('id-ID', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
 
 // ==================== CRUD OPERATIONS ====================
 
@@ -438,8 +339,13 @@ document.addEventListener('scripts:loaded', function() {
     if (addTaskBtn) {
         addTaskBtn.addEventListener('click', openNewTaskModal);
         console.log('New Task button listener attached');
-    } else {
-        console.error('New Task button not found!');
+    }
+
+    // Clear Completed Button
+    const clearCompletedBtn = document.getElementById('clear-completed-btn');
+    if (clearCompletedBtn) {
+        clearCompletedBtn.addEventListener('click', clearCompletedTasks);
+        console.log('Clear Completed button listener attached');
     }
 
     // Save Task Button
@@ -447,8 +353,6 @@ document.addEventListener('scripts:loaded', function() {
     if (saveTaskBtn) {
         saveTaskBtn.addEventListener('click', saveTask);
         console.log('Save Task button listener attached');
-    } else {
-        console.error('Save Task button not found!');
     }
 
     // Difficulty Buttons
@@ -469,7 +373,6 @@ document.addEventListener('scripts:loaded', function() {
             console.log('Form submitted via Enter key');
             saveTask();
         });
-        console.log('Form submit listener attached');
     }
 
     // Reset modal when closed
@@ -527,6 +430,35 @@ function addSampleTasks() {
     sampleTasks.forEach(task => createTask(task));
     console.log('Sample tasks added');
 }
+
+/**
+ * Clear all completed tasks
+ */
+function clearCompletedTasks() {
+    console.log('Attempting to clear completed tasks...');
+    
+    const completedCount = tasks.filter(task => task.completed).length;
+    
+    if (completedCount === 0) {
+        showNotification('No completed tasks to clear!', 'info');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete ${completedCount} completed task(s)?`)) {
+        tasks = tasks.filter(task => !task.completed);
+        saveTasks();
+        renderTasks();
+        
+        console.log(`Cleared ${completedCount} completed task(s)`);
+        showNotification(`${completedCount} completed task(s) cleared!`, 'success');
+    } else {
+        console.log('Clear completed tasks cancelled by user');
+    }
+}
+
+// Make function available globally
+window.clearCompletedTasks = clearCompletedTasks;
+
 
 // Make functions available globally for inline event handlers
 window.toggleTask = toggleTask;
