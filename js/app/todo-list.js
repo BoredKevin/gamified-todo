@@ -74,7 +74,7 @@ function getDifficultyBadge(difficulty) {
  */
 function createTask(taskData) {
     console.log('Creating new task:', taskData);
-    
+
     const newTask = {
         id: generateId(),
         title: taskData.title,
@@ -88,7 +88,7 @@ function createTask(taskData) {
     tasks.push(newTask);
     saveTasks();
     renderTasks();
-    
+
     console.log('Task created successfully:', newTask);
     showNotification('Task created successfully!', 'success');
 }
@@ -107,9 +107,9 @@ function getTaskById(id) {
  */
 function updateTask(id, updatedData) {
     console.log(`Updating task ${id} with data:`, updatedData);
-    
+
     const taskIndex = tasks.findIndex(task => task.id === id);
-    
+
     if (taskIndex === -1) {
         console.error(`Task with ID ${id} not found!`);
         return;
@@ -125,7 +125,7 @@ function updateTask(id, updatedData) {
 
     saveTasks();
     renderTasks();
-    
+
     console.log('Task updated successfully:', tasks[taskIndex]);
     showNotification('Task updated successfully!', 'success');
 }
@@ -135,9 +135,9 @@ function updateTask(id, updatedData) {
  */
 function deleteTask(id) {
     console.log(`Attempting to delete task with ID: ${id}`);
-    
+
     const task = getTaskById(id);
-    
+
     if (!task) {
         console.error(`Task with ID ${id} not found!`);
         return;
@@ -148,7 +148,7 @@ function deleteTask(id) {
         tasks = tasks.filter(task => task.id !== id);
         saveTasks();
         renderTasks();
-        
+
         console.log(`Task deleted successfully. Remaining tasks: ${tasks.length}`);
         showNotification('Task deleted successfully!', 'info');
     } else {
@@ -161,9 +161,9 @@ function deleteTask(id) {
  */
 function toggleTask(id) {
     console.log(`Toggling task completion for ID: ${id}`);
-    
+
     const task = getTaskById(id);
-    
+
     if (!task) {
         console.error(`Task with ID ${id} not found!`);
         return;
@@ -172,15 +172,15 @@ function toggleTask(id) {
     const wasCompleted = task.completed;
     task.completed = !task.completed;
     task.updatedAt = Date.now();
-    
+
     // Award XP when completing a task
     if (!wasCompleted && task.completed) {
         awardXP(task.difficulty);
     }
-    
+
     saveTasks();
     renderTasks();
-    
+
     console.log(`Task ${task.completed ? 'completed' : 'uncompleted'}:`, task);
 }
 
@@ -189,28 +189,53 @@ function toggleTask(id) {
  */
 function editTask(id) {
     console.log(`Opening edit modal for task ID: ${id}`);
-    
+
     const task = getTaskById(id);
-    
+
     if (!task) {
         console.error(`Task with ID ${id} not found!`);
         return;
     }
 
     currentTaskId = id;
-    
+
     // Populate modal with task data
     document.getElementById('task-title').value = task.title;
     document.getElementById('task-description').value = task.description;
     document.getElementById('modal-title-text').textContent = 'Edit Task';
-    
+
     // Set difficulty
     setDifficulty(task.difficulty);
-    
+
     // Show modal
     $('#taskModal').modal('show');
-    
+
     console.log('Modal populated with task data:', task);
+}
+
+/**
+ * Clear all completed tasks
+ */
+function clearCompletedTasks() {
+    console.log('Attempting to clear completed tasks...');
+
+    const completedCount = tasks.filter(task => task.completed).length;
+
+    if (completedCount === 0) {
+        showNotification('No completed tasks to clear!', 'info');
+        return;
+    }
+
+    if (confirm(`Are you sure you want to delete ${completedCount} completed task(s)?`)) {
+        tasks = tasks.filter(task => !task.completed);
+        saveTasks();
+        renderTasks();
+
+        console.log(`Cleared ${completedCount} completed task(s)`);
+        showNotification(`${completedCount} completed task(s) cleared!`, 'success');
+    } else {
+        console.log('Clear completed tasks cancelled by user');
+    }
 }
 
 // ==================== MODAL FUNCTIONS ====================
@@ -220,16 +245,16 @@ function editTask(id) {
  */
 function openNewTaskModal() {
     console.log('Opening new task modal');
-    
+
     currentTaskId = null;
-    
+
     // Reset form
     document.getElementById('task-form').reset();
     document.getElementById('modal-title-text').textContent = 'Create New Task';
-    
+
     // Set default difficulty
     setDifficulty('medium');
-    
+
     // Show modal
     $('#taskModal').modal('show');
 }
@@ -239,7 +264,7 @@ function openNewTaskModal() {
  */
 function setDifficulty(difficulty) {
     console.log(`Setting difficulty to: ${difficulty}`);
-    
+
     const buttons = document.querySelectorAll('.difficulty-btn');
     buttons.forEach(btn => {
         btn.classList.remove('active');
@@ -264,7 +289,7 @@ function getSelectedDifficulty() {
  */
 function saveTask() {
     console.log('Attempting to save task...');
-    
+
     const title = document.getElementById('task-title').value.trim();
     const description = document.getElementById('task-description').value.trim();
     const difficulty = getSelectedDifficulty();
@@ -293,7 +318,7 @@ function saveTask() {
 
     // Close modal
     $('#taskModal').modal('hide');
-    
+
     // Reset form
     document.getElementById('task-form').reset();
     currentTaskId = null;
@@ -301,37 +326,48 @@ function saveTask() {
 
 // ==================== NOTIFICATION SYSTEM ====================
 
-/**
- * Show notification toast
- */
 function showNotification(message, type = 'info') {
     console.log(`Notification [${type}]: ${message}`);
-    
+
+    // Get or create notification container for stacking
+    let container = document.getElementById('notification-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        document.body.appendChild(container);
+    }
+
     // Create notification element
     const notification = document.createElement('div');
-    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.className = `alert alert-${type} alert-dismissible fade position-fixed`;
+    notification.style.cssText = 'min-width: 300px; margin-bottom: 10px; animation: slideIn 0.3s ease-out;';
     notification.innerHTML = `
         ${message}
-        <button type="button" class="close" data-dismiss="alert">
+        <button type="button" class="close" data-dismiss="alert" onclick="this.parentElement.style.animation='slideOut 0.3s ease-out'; setTimeout(() => this.parentElement.remove(), 300)">
             <span>&times;</span>
         </button>
     `;
-    
-    document.body.appendChild(notification);
-    
-    // Auto remove after 3 seconds
+
+    container.appendChild(notification);
+
+    // Add 'show' class for Bootstrap fade effect
+    setTimeout(() => notification.classList.add('show'), 10);
+
+    // Auto remove after 3 seconds with animation
     setTimeout(() => {
-        notification.remove();
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
+
 
 // ==================== EVENT LISTENERS ====================
 
 /**
  * Initialize event listeners when DOM is ready
  */
-document.addEventListener('scripts:loaded', function() {
+document.addEventListener('scripts:loaded', function () {
     console.log('scripts:loaded - Initializing event listeners...');
 
     // New Task Button
@@ -358,7 +394,7 @@ document.addEventListener('scripts:loaded', function() {
     // Difficulty Buttons
     const difficultyButtons = document.querySelectorAll('.difficulty-btn');
     difficultyButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
             const difficulty = this.dataset.difficulty;
             setDifficulty(difficulty);
         });
@@ -368,7 +404,7 @@ document.addEventListener('scripts:loaded', function() {
     // Form submission on Enter key
     const taskForm = document.getElementById('task-form');
     if (taskForm) {
-        taskForm.addEventListener('submit', function(e) {
+        taskForm.addEventListener('submit', function (e) {
             e.preventDefault();
             console.log('Form submitted via Enter key');
             saveTask();
@@ -376,7 +412,7 @@ document.addEventListener('scripts:loaded', function() {
     }
 
     // Reset modal when closed
-    $('#taskModal').on('hidden.bs.modal', function() {
+    $('#taskModal').on('hidden.bs.modal', function () {
         console.log('Modal closed - Resetting form');
         document.getElementById('task-form').reset();
         currentTaskId = null;
@@ -408,7 +444,7 @@ function clearAllTasks() {
  */
 function addSampleTasks() {
     console.log('DEBUG: Adding sample tasks...');
-    
+
     const sampleTasks = [
         {
             title: 'Complete project documentation',
@@ -431,30 +467,6 @@ function addSampleTasks() {
     console.log('Sample tasks added');
 }
 
-/**
- * Clear all completed tasks
- */
-function clearCompletedTasks() {
-    console.log('Attempting to clear completed tasks...');
-    
-    const completedCount = tasks.filter(task => task.completed).length;
-    
-    if (completedCount === 0) {
-        showNotification('No completed tasks to clear!', 'info');
-        return;
-    }
-    
-    if (confirm(`Are you sure you want to delete ${completedCount} completed task(s)?`)) {
-        tasks = tasks.filter(task => !task.completed);
-        saveTasks();
-        renderTasks();
-        
-        console.log(`Cleared ${completedCount} completed task(s)`);
-        showNotification(`${completedCount} completed task(s) cleared!`, 'success');
-    } else {
-        console.log('Clear completed tasks cancelled by user');
-    }
-}
 
 // Make function available globally
 window.clearCompletedTasks = clearCompletedTasks;
