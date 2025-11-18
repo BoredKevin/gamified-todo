@@ -338,9 +338,9 @@ function showNotification(message, type = 'info') {
         document.body.appendChild(container);
     }
 
-    // Create notification element
+    // Create notification element (NO position-fixed here!)
     const notification = document.createElement('div');
-    notification.className = `alert alert-${type} alert-dismissible fade position-fixed`;
+    notification.className = `alert alert-${type} alert-dismissible fade`;
     notification.style.cssText = 'min-width: 300px; margin-bottom: 10px; animation: slideIn 0.3s ease-out;';
     notification.innerHTML = `
         ${message}
@@ -360,6 +360,7 @@ function showNotification(message, type = 'info') {
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
+
 
 
 // ==================== EVENT LISTENERS ====================
