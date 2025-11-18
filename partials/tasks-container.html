@@ -1,32 +1,33 @@
 <div class="row">
     <div class="col-lg-7 mb-4">
-        <!-- Enhanced To-Do / Tasks -->
+        <!-- Active Tasks -->
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                <h6 class="m-0 font-weight-bold text-primary">Tasks</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Active Tasks</h6>
                 <button id="add-task-btn" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus mr-1"></i> New Task
                 </button>
             </div>
             <div class="card-body">
-                <!-- Tasks list -->
-                <ul id="task-list" class="list-group">
+                <!-- Active tasks list -->
+                <ul id="active-task-list" class="list-group">
                     <!-- Items will be rendered here by JS -->
                 </ul>
             </div>
         </div>
     </div>
-    <div class="col-xl-4 col-lg-5 mb-4">
+    <div class="col-lg-5 mb-4">
         <!-- Completed Tasks -->
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold text-primary">Completed Tasks</h6>
-                <button id="add-task-btn" class="btn btn-danger btn-sm">
-                    <i class="fas fa-trash mr-1"></i> Clear</button>
+                <button id="clear-completed-btn" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash mr-1"></i> Clear
+                </button>
             </div>
             <div class="card-body">
-                <!-- Tasks list -->
-                <ul id="task-list" class="list-group">
+                <!-- Completed tasks list -->
+                <ul id="completed-task-list" class="list-group">
                     <!-- Items will be rendered here by JS -->
                 </ul>
             </div>
