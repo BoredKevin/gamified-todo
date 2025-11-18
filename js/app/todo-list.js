@@ -268,8 +268,14 @@ function toggleTask(id) {
         return;
     }
 
+    const wasCompleted = task.completed;
     task.completed = !task.completed;
     task.updatedAt = Date.now();
+    
+    // Award XP when completing a task
+    if (!wasCompleted && task.completed) {
+        awardXP(task.difficulty);
+    }
     
     saveTasks();
     renderTasks();

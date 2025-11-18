@@ -54,6 +54,7 @@ async function bootstrapApp() {
     await loadScript('vendor/jquery-easing/jquery.easing.min.js');
     await loadScript('js/sb-admin-2.min.js');
     await loadScript('js/app/todo-list.js');
+    await loadScript('js/app/leveling-system.js');
     await loadScript('vendor/chart.js/Chart.min.js');
     await loadScript('js/demo/chart-area-demo.js');
     await loadScript('js/demo/chart-pie-demo.js');
