@@ -45,14 +45,21 @@
                         <div>
                             <h1 class="h3 mb-0 text-gray-800">Learning Dashboard</h1>
                             <span class="badge-duo">Retro Duo theme</span>
+                            
                         </div>
+                        <div id="loading-spinner">
+                                <div class="spinner-grow" role="status" id="loading-spinner">
+                                    <span class="visually-hidden"></span>
+                                </div>
+                                <span>Loading</span>
+                            </div>
                         <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                             Start today’s lesson
                         </a>
                     </div>
 
                     <noscript>
-                        <div class="alert alert-danger" role="alert" id="javascript-warning" style="display: block;">
+                        <div class="alert alert-danger" role="alert" style="display: block;">
                             Please enable JavaScript!
                         </div>
                     </noscript>
@@ -107,7 +114,7 @@
             </div>
 
             <!-- Bootstrap core JavaScript-->
-            <script src="js/partials-loader.js" defer></script>
+            <script src="js/loader.js" defer></script>
 
             <script src="vendor/jquery/jquery.min.js" defer></script>
             <script src="vendor/bootstrap/js/bootstrap.bundle.min.js" defer></script>

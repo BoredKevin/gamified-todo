@@ -65,6 +65,7 @@ async function bootstrapApp() {
     
     console.log('All scripts loaded successfully');
     document.dispatchEvent(new Event('scripts:loaded'));
+    document.getElementById('loading-spinner').style.visibility = 'hidden';
   } catch (err) {
     console.error('Error bootstrapping app:', err);
   }
