@@ -48,7 +48,7 @@ function calculateLevel(totalXP) {
  * Calculate XP required for next level
  */
 function getXPForLevel(level) {
-    return 25 * level * level ;
+    return 25 * level ;
 }
 
 /**
