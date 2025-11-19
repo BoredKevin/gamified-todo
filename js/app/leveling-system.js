@@ -41,14 +41,14 @@ let userStats = JSON.parse(localStorage.getItem('userStats')) || {
  * Formula: Level = floor(sqrt(totalXP / 100))
  */
 function calculateLevel(totalXP) {
-    return Math.floor(Math.sqrt(totalXP / 100)) + 1;
+    return Math.floor(Math.sqrt(totalXP / 25)) + 1;
 }
 
 /**
  * Calculate XP required for next level
  */
 function getXPForLevel(level) {
-    return 100 * level * level;
+    return 25 * level * level ;
 }
 
 /**
@@ -111,7 +111,7 @@ function saveUserStats() {
  */
 function updateStatsDisplay() {
     const statsContainer = document.getElementById('user-stats');
-    if (!statsContainer) return;
+    if (!statsContainer) return error('Stats container not found!');
     
     const progress = getLevelProgress();
     
@@ -175,6 +175,159 @@ function showLevelUpNotification(level) {
     }, 5000);
 }
 
-document.addEventListener('scripts:loaded', () => {
+
+// ==================== DAILY XP & STREAK TRACKING ====================
+
+/**
+ * Get today's date as a string (YYYY-MM-DD format)
+ */
+function getTodayString() {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+}
+
+/**
+ * Initialize daily stats from localStorage
+ */
+let dailyStats = JSON.parse(localStorage.getItem('dailyStats')) || {
+    dailyXP: {},  // { "2025-11-19": 25, "2025-11-18": 50 }
+    lastActiveDate: null,
+    currentStreak: 0
+};
+
+/**
+ * Track XP gained today
+ */
+function trackDailyXP(xpAmount) {
+    const today = getTodayString();
+    
+    // Initialize today's XP if not exists
+    if (!dailyStats.dailyXP[today]) {
+        dailyStats.dailyXP[today] = 0;
+    }
+    
+    // Add XP to today's total
+    dailyStats.dailyXP[today] += xpAmount;
+    
+    // Update last active date
+    dailyStats.lastActiveDate = today;
+    
+    // Calculate streak
+    calculateStreak();
+    
+    saveDailyStats();
+    updateDailyStatsDisplay();
+    
+    console.log(`Daily XP updated: ${dailyStats.dailyXP[today]} XP today`);
+}
+
+/**
+ * Calculate current streak
+ */
+function calculateStreak() {
+    const dates = Object.keys(dailyStats.dailyXP).sort().reverse();
+    
+    if (dates.length === 0) {
+        dailyStats.currentStreak = 0;
+        return;
+    }
+    
+    const today = getTodayString();
+    let streak = 0;
+    let currentDate = new Date(today);
+    
+    // Check if user was active today or yesterday (grace period)
+    const lastActive = new Date(dates[0]);
+    const daysDiff = Math.floor((new Date(today) - lastActive) / (1000 * 60 * 60 * 24));
+    
+    if (daysDiff > 1) {
+        // Streak broken
+        dailyStats.currentStreak = 0;
+        return;
+    }
+    
+    // Count consecutive days backwards
+    for (let i = 0; i < dates.length; i++) {
+        const dateString = currentDate.toISOString().split('T')[0];
+        
+        if (dailyStats.dailyXP[dateString]) {
+            streak++;
+            currentDate.setDate(currentDate.getDate() - 1);
+        } else {
+            break;
+        }
+    }
+    
+    dailyStats.currentStreak = streak;
+}
+
+/**
+ * Get XP gained today
+ */
+function getXPToday() {
+    const today = getTodayString();
+    return dailyStats.dailyXP[today] || 0;
+}
+
+/**
+ * Save daily stats to localStorage
+ */
+function saveDailyStats() {
+    try {
+        localStorage.setItem('dailyStats', JSON.stringify(dailyStats));
+        console.log('Daily stats saved:', dailyStats);
+    } catch (error) {
+        console.error('Error saving daily stats:', error);
+    }
+}
+
+/**
+ * Update daily stats display in UI
+ */
+function updateDailyStatsDisplay() {
+    // Update XP Gained Today
+    const xpTodayElement = document.querySelector('.card-duo-metric--green .display-4');
+    if (xpTodayElement) {
+        xpTodayElement.textContent = getXPToday();
+    }
+    
+    // Update Day Streak
+    const streakElement = document.querySelector('.card-duo-metric--yellow .display-4');
+    if (streakElement) {
+        streakElement.textContent = dailyStats.currentStreak;
+    }
+}
+
+// Modify the existing awardXP function to include daily tracking
+// Replace the existing awardXP function with this updated version:
+function awardXP(difficulty) {
+    const xpEarned = XP_REWARDS[difficulty] || 0;
+    const previousLevel = userStats.level;
+    
+    userStats.totalXP += xpEarned;
+    userStats.tasksCompleted++;
+    userStats.level = calculateLevel(userStats.totalXP);
+    
+    saveUserStats();
+    
+    // Track daily XP
+    trackDailyXP(xpEarned);
+    
+    console.log(`Awarded ${xpEarned} XP for ${difficulty} task`);
+    
+    // Check if leveled up
+    if (userStats.level > previousLevel) {
+        showLevelUpNotification(userStats.level);
+    } else {
+        showXPNotification(xpEarned);
+    }
+    
     updateStatsDisplay();
+}
+
+document.addEventListener('scripts:loaded', () => {
+    calculateStreak();
+    updateDailyStatsDisplay();
+    updateStatsDisplay();
+    console.log('Daily stats initialized');
 });
