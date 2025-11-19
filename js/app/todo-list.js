@@ -47,7 +47,7 @@ function generateId() {
 function saveTasks() {
     try {
         localStorage.setItem('tasks', JSON.stringify(tasks));
-        console.log('Tasks saved to localStorage:', tasks);
+        console.log('Tasks saved to localStorage');
     } catch (error) {
         console.error('Error saving tasks:', error);
     }
@@ -461,7 +461,215 @@ function addSampleTasks() {
             title: 'Team meeting',
             description: 'Weekly sync with the development team',
             difficulty: 'easy'
-        }
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },{
+            title: 'Fix critical bug',
+            description: 'Resolve the login authentication issue',
+            difficulty: 'hard'
+        },
     ];
 
     sampleTasks.forEach(task => createTask(task));
