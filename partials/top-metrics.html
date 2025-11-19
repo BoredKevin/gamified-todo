@@ -1,22 +1,35 @@
 <!-- Top metrics row -->
 <div class="row">
 
-    <!-- XP Today -->
+    <!-- Streak -->
     <div class="col-xl-4 col-md-6 mb-4">
-        <div class="card card-duo-metric card-duo-metric--green">
+        <div class="card card-duo-metric card-duo-metric--green h-100" style="position: relative; overflow: hidden;">
+            <i class="fa-solid fa-star"
+                style="position: absolute; top: -15px; right: -15px; font-size: 80px; opacity: 0.2;"></i>
             <div class="card-body">
-                <h5 class="mb-2">XP today</h5>
+                <h5 class="mb-2">XP Gained Today</h5>
                 <div class="d-flex align-items-end justify-content-between">
-                    <span class="display-4">42</span>
-                    <span class="text-muted small">Goal: 50 XP</span>
+                    <span class="display-4">6</span>
+                    <span class="text-muted small">Goal: 50XP</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logo -->
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card card-duo-metric h-100">
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <img src="" alt="Logo" class="img-fluid" style="max-width: 150px;">
             </div>
         </div>
     </div>
 
     <!-- Streak -->
     <div class="col-xl-4 col-md-6 mb-4">
-        <div class="card card-duo-metric card-duo-metric--yellow">
+        <div class="card card-duo-metric card-duo-metric--yellow h-100" style="position: relative; overflow: hidden;">
+            <i class="fa-solid fa-fire"
+                style="position: absolute; top: -5px; right: -5px; font-size: 80px; opacity: 0.2;"></i>
             <div class="card-body">
                 <h5 class="mb-2">Day streak</h5>
                 <div class="d-flex align-items-end justify-content-between">
@@ -27,43 +40,5 @@
         </div>
     </div>
 
-    <!-- Words learned -->
-    <div class="col-xl-4 col-md-12 mb-4">
-        <div class="card card-duo-metric card-duo-metric--blue">
-            <div class="card-body">
-                <h5 class="mb-2">Words learned</h5>
-                <div class="d-flex align-items-end justify-content-between">
-                    <span class="display-4">320</span>
-                    <span class="text-muted small">This month</span>
-                </div>
-            </div>
-        </div>
-    </div>
 
-</div>
-
-<div class="col-lg-7 mb-4">
-    <!-- XP & Level Stats -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">
-                <i class="fas fa-chart-line"></i> Your Progress
-            </h6>
-        </div>
-        <div class="card-body">
-            <div id="user-stats">
-                <!-- Stats will be rendered here by JS -->
-            </div>
-            
-            <!-- XP Guide -->
-            <div class="mt-4">
-                <h6 class="font-weight-bold">XP Rewards:</h6>
-                <ul class="list-unstyled">
-                    <li><span class="badge badge-success"><i class="fas fa-smile"></i> Easy</span> = 10 XP</li>
-                    <li><span class="badge badge-warning"><i class="fas fa-meh"></i> Medium</span> = 25 XP</li>
-                    <li><span class="badge badge-danger"><i class="fas fa-fire"></i> Hard</span> = 50 XP</li>
-                </ul>
-            </div>
-        </div>
-    </div>
 </div>
