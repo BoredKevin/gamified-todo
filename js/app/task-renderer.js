@@ -165,7 +165,7 @@ window.toggleDescription = toggleDescription;
 
 
 // ==================== PAGINATION CONFIGURATION ====================
-const TASKS_PER_PAGE = 10;
+const TASKS_PER_PAGE = 5;
 let activePage = 1;
 let completedPage = 1;
 
