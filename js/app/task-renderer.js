@@ -198,12 +198,12 @@ function createPaginationControls(totalPages, currentPage, isActiveList) {
             <button class="btn btn-sm btn-outline-primary ${currentPage === 1 ? 'disabled' : ''}" 
                     onclick="changePage('${listType}', ${currentPage - 1})"
                     ${currentPage === 1 ? 'disabled' : ''}>
-                <i class="fas fa-chevron-left"></i> Previous
+                <i class="fas fa-chevron-left"></i>
             </button>
             
             <div class="page-info">
                 <span class="badge badge-primary">
-                    Page ${currentPage} of ${totalPages}
+                    ${currentPage} / ${totalPages}
                 </span>
                 ${createPageNumbers(totalPages, currentPage, listType)}
             </div>
@@ -211,7 +211,7 @@ function createPaginationControls(totalPages, currentPage, isActiveList) {
             <button class="btn btn-sm btn-outline-primary ${currentPage === totalPages ? 'disabled' : ''}" 
                     onclick="changePage('${listType}', ${currentPage + 1})"
                     ${currentPage === totalPages ? 'disabled' : ''}>
-                Next <i class="fas fa-chevron-right"></i>
+                <i class="fas fa-chevron-right"></i>
             </button>
         </div>
     `;
@@ -237,19 +237,19 @@ function createPageNumbers(totalPages, currentPage, listType) {
     // First page button
     if (startPage > 1) {
         pageNumbers += `
-            <button class="btn btn-sm btn-outline-secondary" onclick="changePage('${listType}', 1)">
+            <button class="btn btn-sm" onclick="changePage('${listType}', 1)">
                 1
             </button>
         `;
         if (startPage > 2) {
-            pageNumbers += '<span class="btn btn-sm disabled">...</span>';
+            pageNumbers += '<span class="btn btn-sm btn-outline-light disabled">...</span>';
         }
     }
     
     // Page number buttons
     for (let i = startPage; i <= endPage; i++) {
         pageNumbers += `
-            <button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-secondary'}" 
+            <button class="btn btn-sm ${i === currentPage ? 'btn-primary' : ''}" 
                     onclick="changePage('${listType}', ${i})">
                 ${i}
             </button>
@@ -259,10 +259,10 @@ function createPageNumbers(totalPages, currentPage, listType) {
     // Last page button
     if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
-            pageNumbers += '<span class="btn btn-sm disabled">...</span>';
+            pageNumbers += '<span class="btn btn-sm btn-outline-light disabled">...</span>';
         }
         pageNumbers += `
-            <button class="btn btn-sm btn-outline-secondary" onclick="changePage('${listType}', ${totalPages})">
+            <button class="btn btn-sm" onclick="changePage('${listType}', ${totalPages})">
                 ${totalPages}
             </button>
         `;
