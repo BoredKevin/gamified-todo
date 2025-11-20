@@ -329,5 +329,11 @@ document.addEventListener('scripts:loaded', () => {
     calculateStreak();
     updateDailyStatsDisplay();
     updateStatsDisplay();
+
+    const xpGoalElement = document.getElementById('xp-goal');
+    if (xpGoalElement) {
+        const progress = getLevelProgress();
+        xpGoalElement.textContent = `Goal: ${Math.ceil((progress.required) / 3)}XP`;
+    }
     console.log('Daily stats initialized');
 });
