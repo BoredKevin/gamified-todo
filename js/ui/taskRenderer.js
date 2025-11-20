@@ -76,7 +76,7 @@ const TaskRenderer = {
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" 
                                 id="task-${task.id}" 
-                                ${task.completed ? 'checked' : ''}
+                                ${task.completed ? 'checked disabled' : ''}
                                 data-action="toggle" data-id="${task.id}">
                             <label class="custom-control-label" for="task-${task.id}">
                                 <strong class="${task.completed ? 'text-muted text-decoration-line-through' : ''}" 
